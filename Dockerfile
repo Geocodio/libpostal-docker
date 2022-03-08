@@ -1,4 +1,4 @@
-FROM debian:bookworm
+FROM debian:bullseye
 
 RUN apt-get update && \
     apt-get -y install git curl \
@@ -16,5 +16,7 @@ RUN cd /tmp/libpostal && \
 	make install && \
 	ldconfig
 
+# Note: We're disabling all chunking since the download seems to fail everytime we're trying to download in chunks
 RUN cd /tmp/libpostal && \
+	sed -i -E 's/_CHUNKS=[0-9]+/_CHUNKS=1/g' /usr/local/bin/libpostal_data && \
 	libpostal_data download all /var/task/libpostal/data/libpostal
