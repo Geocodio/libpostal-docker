@@ -4,6 +4,7 @@ RUN apt-get update && \
     apt-get -y install git curl \
     build-essential autoconf automake libtool pkg-config
 
+# libpostal
 RUN cd /tmp && \
 	git clone https://github.com/openvenues/libpostal && \
 	cd libpostal && \
@@ -20,3 +21,18 @@ RUN cd /tmp/libpostal && \
 RUN cd /tmp/libpostal && \
 	sed -i -E 's/_CHUNKS=[0-9]+/_CHUNKS=1/g' /usr/local/bin/libpostal_data && \
 	libpostal_data download all /var/task/libpostal/data/libpostal
+
+# postal-php
+RUN apt-get update && \
+    apt-get -y install libreadline-dev libsnappy-dev \
+    php-cli php-dev php-curl php-mbstring php-zip php-dom php-gd php-sqlite3 php-geos
+
+RUN cd /tmp && \
+	git clone https://github.com/openvenues/php-postal && \
+	cd php-postal && \
+	phpize && \
+	pkg-config libpostal && \
+	./configure && \
+	make && \
+	make install && \
+	cp modules/postal.so /usr/lib/php/postal.so
